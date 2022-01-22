@@ -12,16 +12,36 @@ it is characterized by:
 #pragma once
 
 #include <iostream>
+#include <array>
+#include <static_vec.h>
+
 namespace sim2d {
 class Robot {
     public:
 
     const double size; // m
-    double vl, va; // m/s rad/s
-    double px, py, pa; // m m rad
-
-    void move(double dt);
+    rp::Vec_<double,2> vel; // linear vel and angular vel (m/s rad/s)
+    rp::Vec_<double,3> pose; // m m rad
 
     Robot(double s): size(s) {}
+
+    inline double& vl() {return vel.at(0);}
+    inline double& va() {return vel[1];}
+    inline double& px() {return pose.at(0);}
+    inline double& py() {return pose[1];}
+    inline double& pa() {return pose[3];}
+    inline const double& vl() const {return vel.at(0);}
+    inline const double& va() const {return vel[1];}
+    inline const double& px() const {return pose[0];}
+    inline const double& py() const {return pose[1];}
+    inline const double& pa() const {return pose[3];}
+
+
+    rp::Vec_<double,2> get_xy_speed();
+    void move(double dt);
+
+
+    
+
 };
 }

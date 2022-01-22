@@ -5,11 +5,11 @@
 #include "map.h"
 #include "robot.h"
 #include "vector"
-#include "array"
+#include "static_vec.h"
 
 #define UPDATE_RATE 100 // ms
 
-typedef std::array<int,2> pos2;
+typedef rp::Vec_<cell_index,2> grid2;
 
 namespace sim2d {
 class World {
@@ -17,7 +17,7 @@ class World {
     Map map;
     Robot robot;
     const int radius; // robot size, but in pixels
-    const std::vector<pos2> robot_footprint; // a circle that represents the robot in cells
+    const std::vector<grid2> robot_footprint; // a circle that represents the robot in cells
 
     World(Map& m, Robot& r): map(m), 
                              robot(r),
@@ -33,6 +33,6 @@ class World {
     
     bool check_collision();
 
-    std::vector<pos2> get_footprint();
+    std::vector<grid2> get_footprint();
 };
 }
