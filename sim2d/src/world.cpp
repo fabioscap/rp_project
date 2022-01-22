@@ -9,11 +9,16 @@ void World::update(){
 
 }
 bool World::check_collision() {
+    // get the robot position in the map
+    grid2 gpos = real_units_to_cell(robot.pxy());
     auto it = robot_footprint.begin();
     while (it != robot_footprint.end()) {
-        
+        auto point = *it + gpos;
+
+        it++;
     }
 
+    return false;
 }
 
 std::vector<grid2> World::get_footprint() {

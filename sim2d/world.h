@@ -9,7 +9,6 @@
 
 #define UPDATE_RATE 100 // ms
 
-typedef rp::Vec_<cell_index,2> grid2;
 
 namespace sim2d {
 class World {
@@ -34,5 +33,10 @@ class World {
     bool check_collision();
 
     std::vector<grid2> get_footprint();
+
+    inline grid2 real_units_to_cell(pos2 pxy) const {
+        return {(cell_index)(pxy[0]/map.resolution),
+                (cell_index)(pxy[1]/map.resolution)};
+    }
 };
 }

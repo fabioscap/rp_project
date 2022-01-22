@@ -1,10 +1,13 @@
 #pragma once
 
 #include <iostream>
+#include "static_vec.h"
+
 #define WALL 100
 #define OTHER 50
 
 typedef int32_t cell_index;
+typedef rp::Vec_<cell_index,2> grid2;
 
 namespace sim2d {
 // maybe template the dimensions

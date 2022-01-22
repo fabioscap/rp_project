@@ -69,8 +69,8 @@ namespace rp {
     inline const Scalar& operator[](int pos) const {
       return _values[pos];
     }
-
-  protected:
+    // removed protected so I can init w curly braces 
+    //https://en.cppreference.com/w/cpp/language/aggregate_initialization
     Scalar _values[Dim_];
   };
   
