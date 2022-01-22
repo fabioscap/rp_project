@@ -16,14 +16,15 @@ uint64_t timeSinceEpochMillisec() {
 int main() {
     std::cout << "ciao" << std::endl;
 
-    Map m = Map(0.02,10,10,nullptr);
+    Map m = Map(0.02,30,30,nullptr);
 
-    int8_t data[10*10];
+    int8_t data[30*30];
     m.data = data;
-    for (int8_t i=0; i<10; ++i) {
-        for (int8_t j=0; j<10; ++j) {
-            if (i==0 || i == 9 || j == 0 || j == 9) 
+    for (int8_t i=0; i<30; ++i) {
+        for (int8_t j=0; j<30; ++j) {
+            if (i==0 || i == 30-1 || j == 0 || j == 30-1) 
                 m.at(i,j) = WALL;
+            else m.at(i,j) = 0;
         }
     }
 
@@ -35,6 +36,7 @@ int main() {
 
     //https://stackoverflow.com/questions/46609863/execute-function-every-10-ms-in-c
     // how to do a timed loop
+    /*
     using namespace std::chrono;
     auto now = system_clock::now(); 
     auto next = now + milliseconds(UPDATE_RATE);
@@ -45,6 +47,7 @@ int main() {
         std::this_thread::sleep_until(next);
         next+=milliseconds(UPDATE_RATE);
     }
+    */
 
-    return 0;
+   return 0;
 }
