@@ -14,5 +14,7 @@ rp::Vec_<double,2> Robot::get_xy_speed() {
 }
 
 void Robot::move(double dt) {
-
+    pose[0] += dt*vel[0]*cos(pose[2]);
+    pose[1] += dt*vel[0]*sin(pose[2]);
+    pose[3] += dt*vel[1];
 }

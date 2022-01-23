@@ -30,7 +30,7 @@ class World {
     // I can compute all cells where robot is /not colliding.
     // but I don't know whether it makes sense or not.
     
-    bool check_collision();
+    bool check_collision(pos2 pxy) const;
 
     std::vector<grid2> get_footprint();
 

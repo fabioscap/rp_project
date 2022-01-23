@@ -27,16 +27,16 @@ class Robot {
 
     Robot(double s): size(s) {}
 
-    inline double& vl() {return vel.at(0);}
+    inline double& vl() {return vel[0];}
     inline double& va() {return vel[1];}
-    inline double& px() {return pose.at(0);}
+    inline double& px() {return pose[0];}
     inline double& py() {return pose[1];}
-    inline double& pa() {return pose[3];}
-    inline const double& vl() const {return vel.at(0);}
+    inline double& pa() {return pose[2];}
+    inline const double& vl() const {return vel[0];}
     inline const double& va() const {return vel[1];}
     inline const double& px() const {return pose[0];}
     inline const double& py() const {return pose[1];}
-    inline const double& pa() const {return pose[3];}
+    inline const double& pa() const {return pose[2];}
     inline const pos2 pxy() const {return {px(),py()};}
 
 
