@@ -9,7 +9,7 @@
 #define OTHER 50
 
 typedef int32_t cell_index;
-typedef uint8_t cell_value;
+typedef int8_t cell_value;
 typedef rp::Vec_<cell_index,2> grid2;
 
 namespace sim2d {
@@ -28,6 +28,12 @@ class Map {
     inline cell_value& at(const grid2& ij) {return _at(ij[0],ij[1]);}
     inline const cell_value& at(const grid2& ij) const {return _at(ij[0],ij[1]);}
     
+    Map(const Map& other):  width(other.width),
+                            height(other.height),
+                            dimension(other.dimension),
+                            data(other.data),
+                            resolution(other.resolution) {};
+
     Map(double res, cell_index w, cell_index h): resolution(res), 
                                             width(w),
                                             height(h),
