@@ -1,11 +1,19 @@
-cmake_minimum_required(VERSION 3.16)
-project(rp_2d_simulator)
+cmake_minimum_required(VERSION 3.0.2)
+project(rp_project)
 
-find_package(roscpp REQUIRED)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs)
 
-link_directories("/opt/ros/noetic/lib")
-include_directories("/opt/ros/noetic/include")
+catkin_package()
+
+include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR}/sim2d)
+include_directories(${PROJECT_SOURCE_DIR}/sim2d_ros)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/sim2d)
-add_subdirectory(${PROJECT_SOURCE_DIR}/exec)
+add_subdirectory(${PROJECT_SOURCE_DIR}/sim2d_ros)
+
+add_executable(Prova_ros exec/prova_ros.cpp)
+target_link_libraries(Prova_ros ${catkin_LIBRARIES})
+target_link_libraries(Prova_ros sim2d)
+target_link_libraries(Prova_ros sim2d_ros)
+

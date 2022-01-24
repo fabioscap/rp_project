@@ -3,11 +3,13 @@
 #include <iostream>
 #include "static_vec.h"
 #include <assert.h>
+#include <vector>
 
 #define WALL 100
 #define OTHER 50
 
 typedef int32_t cell_index;
+typedef uint8_t cell_value;
 typedef rp::Vec_<cell_index,2> grid2;
 
 namespace sim2d {
@@ -21,24 +23,30 @@ class Map {
     const cell_index dimension; // pixels
 
 
-    inline int8_t& at(cell_index i, cell_index j) {return _at(i,j);}
-    inline const int8_t& at(cell_index i, cell_index j) const {return _at(i,j);}
-    inline int8_t& at(const grid2& ij) {return _at(ij[0],ij[1]);}
-    inline const int8_t& at(const grid2& ij) const {return _at(ij[0],ij[1]);}
+    inline cell_value& at(cell_index i, cell_index j) {return _at(i,j);}
+    inline const cell_value& at(cell_index i, cell_index j) const {return _at(i,j);}
+    inline cell_value& at(const grid2& ij) {return _at(ij[0],ij[1]);}
+    inline const cell_value& at(const grid2& ij) const {return _at(ij[0],ij[1]);}
+    
+    Map(double res, cell_index w, cell_index h): resolution(res), 
+                                            width(w),
+                                            height(h),
+                                            dimension(w*h),
+                                            data(dimension) {};
 
-    Map(double res, cell_index w, cell_index h, int8_t* d): resolution(res), 
+    Map(double res, cell_index w, cell_index h, std::vector<cell_value> d): resolution(res), 
                                             width(w),
                                             height(h),
                                             data(d),
                                             dimension(w*h) {};
-    protected:
-        int8_t* data; // occupancy grid
+    //protected:
+        std::vector<cell_value> data; // occupancy grid
 
-        inline int8_t& _at(cell_index i, cell_index j) {
+        inline cell_value& _at(cell_index i, cell_index j) {
             assert(i>=0&&j>=0&&i<width&&"please access map with valid index");
             return data[i*height+j];
         }
-        inline const int8_t& _at(cell_index i, cell_index j) const {            
+        inline const cell_value& _at(cell_index i, cell_index j) const {            
             assert(i>=0&&j>=0&&j<height&&"please access map with valid index");
             return data[i*height+j];
         }
