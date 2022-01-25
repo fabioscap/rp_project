@@ -1,3 +1,5 @@
+#pragma once
+
 #include "map.h"
 #include "nav_msgs/OccupancyGrid.h"
 
