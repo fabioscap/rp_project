@@ -1,14 +1,22 @@
 #include "world.h"
 #include <math.h>
+#include <chrono>
+#include <thread>
 
 using namespace sim2d;
 
+uint64_t timeSinceEpochMillisec() {
+  using namespace std::chrono;
+  return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+}
+
 void World::update(){
-    pos2 new_pos = robot.pxy() + robot.get_xy_speed()*(UPDATE_RATE/1000);
+    vec2 new_pos = robot.pxy() + robot.get_xy_speed()*(UPDATE_RATE/1000);
     if (!check_collision(new_pos))
         robot.move((double)(UPDATE_RATE)/1000);
 }
-bool World::check_collision(pos2 pxy) const {
+
+bool World::check_collision(vec2 pxy) const {
     // get the robot position in the map
     grid2 gpos = real_units_to_cell(pxy);
     auto it = robot_footprint.begin();
@@ -39,4 +47,22 @@ std::vector<grid2> World::get_footprint() {
         }
     }
     return vec;
+}
+void World::run() {
+    auto t = new std::thread(&World::_run,this,UPDATE_RATE);
+}
+
+void World::_run(int MS) {
+    //https://stackoverflow.com/questions/46609863/execute-function-every-10-ms-in-c
+    auto now = std::chrono::system_clock::now(); 
+    auto next = now + std::chrono::milliseconds(MS);
+    while(1) {
+        std::cerr << robot.pose << std::endl;
+        std::cerr << robot.vel << std::endl;
+        m.lock();
+        update();
+        m.unlock();
+        std::this_thread::sleep_until(next);
+        next+=std::chrono::milliseconds(MS);
+    }
 }
