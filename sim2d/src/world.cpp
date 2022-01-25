@@ -26,7 +26,7 @@ bool World::check_collision(vec2 pxy) const {
         if(point[0] < 0 || point[0] >= map.width) return true;
         if(point[1] < 0 || point[1] >= map.height) return true;
         // hit wall
-        if (map.at(point) == WALL) return true;
+        if (map.at(point) == SIM2d_WALL) return true;
 
         it++;
     }

@@ -5,8 +5,10 @@
 #include <assert.h>
 #include <vector>
 
-#define WALL 100
-#define OTHER 50
+#define SIM2d_WALL 100
+#define SIM2d_EMPTY 0
+#define SIM2d_OTHER 50
+#define SIM2d_UNK -1
 
 typedef int32_t cell_index;
 typedef int8_t cell_value;
