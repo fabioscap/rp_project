@@ -15,7 +15,8 @@ it is characterized by:
 #include <array>
 #include <static_vec.h>
 
-typedef rp::Vec_<double,2> pos2;
+typedef rp::Vec_<double,2> vec2;
+typedef rp::Vec_<double,3> vec3;
 
 namespace sim2d {
 class Robot {
@@ -37,10 +38,10 @@ class Robot {
     inline const double& px() const {return pose[0];}
     inline const double& py() const {return pose[1];}
     inline const double& pa() const {return pose[2];}
-    inline const pos2 pxy() const {return {px(),py()};}
+    inline const vec2 pxy() const {return {px(),py()};}
 
 
-    pos2 get_xy_speed();
+    vec2 get_xy_speed();
     void move(double dt);
 
 
