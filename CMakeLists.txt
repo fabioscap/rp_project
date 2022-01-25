@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(rp_project)
 
+find_package(SDL2 REQUIRED)
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs)
 
 catkin_package()
@@ -17,3 +18,8 @@ target_link_libraries(Prova_ros ${catkin_LIBRARIES})
 target_link_libraries(Prova_ros sim2d)
 target_link_libraries(Prova_ros sim2d_ros)
 
+add_executable(Prova_sdl exec/prova_sdl.cpp)
+target_link_libraries(Prova_sdl ${catkin_LIBRARIES})
+target_link_libraries(Prova_sdl sim2d)
+target_link_libraries(Prova_sdl sim2d_ros)
+target_link_libraries(Prova_sdl SDL2)
