@@ -1,5 +1,8 @@
 /*
-
+    TODO there is a bug where once the robot collides then it is stuck forever
+    probably better to use only integers instead of doubles (convert at the end of each step)
+    modify run method to handle quit without crashing
+    program often does x/map.resolution maybe store map.resolution^-1
 */
 #pragma once
 #include "map.h"
@@ -16,17 +19,17 @@ class World {
     public:
     Map map;
     Robot robot;
-    const int radius; // robot size, but in pixels
+    const int radius_cells; // robot size, but in pixels
     const std::vector<grid2> robot_footprint; // a circle that represents the robot in cells
 
-    World(Map&m,double robot_radius): map(m), 
-                                      robot(robot_radius),                             
-                                      radius((int)(robot.size/map.resolution)),
+    World(Map&m,double robot_size): map(m), 
+                                      robot(robot_size),                             
+                                      radius_cells((int)(robot.radius/map.resolution)),
                                       robot_footprint(get_footprint()) {}
 
     World(Map& m, Robot& r): map(m), 
                              robot(r),
-                             radius((int)(robot.size/map.resolution)),
+                             radius_cells((int)(robot.radius/map.resolution)),
                              robot_footprint(get_footprint())
                              {}
 
