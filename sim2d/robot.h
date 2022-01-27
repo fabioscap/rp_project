@@ -22,11 +22,11 @@ namespace sim2d {
 class Robot {
     public:
 
-    const double size; // m
+    const double radius; // m
     rp::Vec_<double,2> vel; // linear vel and angular vel (m/s rad/s)
     rp::Vec_<double,3> pose; // m m rad
 
-    Robot(double s): size(s) {}
+    Robot(double s): radius(s) {}
 
     inline double& vl() {return vel[0];}
     inline double& va() {return vel[1];}
