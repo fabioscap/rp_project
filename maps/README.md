@@ -1,0 +1,1 @@
+this currently "works" with map in "trinary" mode. (see http://wiki.ros.org/map_server#Value_Interpretation)

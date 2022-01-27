@@ -1,5 +1,3 @@
-build/*
-!build/.empty
 maps/*
-!maps/.empty
+!maps/README.md
 .vscode
