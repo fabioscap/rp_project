@@ -15,7 +15,7 @@ typedef int8_t cell_value;
 typedef rp::Vec_<cell_index,2> grid2;
 
 namespace sim2d {
-// maybe template the dimensions
+
 
 class Map {
     public:
@@ -51,12 +51,12 @@ class Map {
         std::vector<cell_value> data; // occupancy grid
 
         inline cell_value& _at(cell_index i, cell_index j) {
-            assert(i>=0&&j>=0&&i<width&&"please access map with valid index");
-            return data[i*height+j];
+            assert(i>=0&&j>=0&&i<width&&j<height&&"please access map with valid index");
+            return data[j*width+i];
         }
         inline const cell_value& _at(cell_index i, cell_index j) const {            
-            assert(i>=0&&j>=0&&j<height&&"please access map with valid index");
-            return data[i*height+j];
+            assert(i>=0&&j>=0&&j<height&&i<width&&"please access map with valid index");
+            return data[j*width+i];
         }
 };
 
