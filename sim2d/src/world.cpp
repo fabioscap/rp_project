@@ -13,7 +13,7 @@ uint64_t timeSinceEpochMillisec() {
 void World::update(){
     vec2 new_pos = robot.pxy() + robot.get_xy_speed()*(UPDATE_RATE/1000);
     if (!check_collision(new_pos))
-        robot.move((double)(UPDATE_RATE)/1000);
+        robot.move(UPDATE_RATE/1000);
 }
 
 bool World::check_collision(vec2 pxy) const {
@@ -23,8 +23,8 @@ bool World::check_collision(vec2 pxy) const {
     while (it != robot_footprint.end()) { //openmp?
         auto point = *it + gpos;
         // out of bounds             
-        if(point[0] < 0 || point[0] >= map.height) {std::cout << "bounds" <<std::endl;return true;}
-        if(point[1] < 0 || point[1] >= map.width) {std::cout << "bounds" <<std::endl;return true;}
+        if(point[0] < 0 || point[0] >= map.width) {std::cout << "bounds" <<std::endl;return true;}
+        if(point[1] < 0 || point[1] >= map.height) {std::cout << "bounds" <<std::endl;return true;}
         // hit wall
         if (map.at(point) == SIM2d_WALL) {std::cout << "wall at: "<< point <<std::endl;return true;}
 
@@ -48,7 +48,9 @@ std::vector<grid2> World::get_footprint() {
     }
     return vec;
 }
+
 void World::run() {
+    running = true;
     auto t = new std::thread(&World::_run,this,UPDATE_RATE);
 }
 
@@ -56,12 +58,13 @@ void World::_run(int MS) {
     //https://stackoverflow.com/questions/46609863/execute-function-every-10-ms-in-c
     auto now = std::chrono::system_clock::now(); 
     auto next = now + std::chrono::milliseconds(MS);
-    while(1) {
-        std::cerr << robot.pose << std::endl;
-        std::cerr << robot.vel << std::endl;
+    while(running) {
+
         m.lock();
         update();
         m.unlock();
+
+
         std::this_thread::sleep_until(next);
         next+=std::chrono::milliseconds(MS);
     }

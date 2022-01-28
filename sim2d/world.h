@@ -1,17 +1,16 @@
 /*
-    TODO there is a bug where once the robot collides then it is stuck forever
-    probably better to use only integers instead of doubles (convert at the end of each step)
     modify run method to handle quit without crashing
     program often does x/map.resolution maybe store map.resolution^-1
 */
 #pragma once
 #include "map.h"
 #include "robot.h"
+#include "laser.h"
 #include "vector"
 #include "static_vec.h"
 #include <mutex>
 
-#define UPDATE_RATE 100 // ms
+#define UPDATE_RATE ((double)10) // ms
 
 
 namespace sim2d {
@@ -19,17 +18,21 @@ class World {
     public:
     Map map;
     Robot robot;
+    Laser laser;
     const int radius_cells; // robot size, but in pixels
+    const int range_cells; // laser range, but in pixels
     const std::vector<grid2> robot_footprint; // a circle that represents the robot in cells
 
     World(Map&m,double robot_size): map(m), 
                                       robot(robot_size),                             
                                       radius_cells((int)(robot.radius/map.resolution)),
+                                      range_cells((int)(laser.range/map.resolution)),
                                       robot_footprint(get_footprint()) {}
 
     World(Map& m, Robot& r): map(m), 
                              robot(r),
                              radius_cells((int)(robot.radius/map.resolution)),
+                             range_cells((int)(laser.range/map.resolution)),
                              robot_footprint(get_footprint())
                              {}
 
@@ -74,8 +77,12 @@ class World {
         m.unlock();
     }
 
-    protected:
+    inline void stop() {
+        running = false;
+    }
 
+    protected:
+    bool running;
     std::mutex m;
     void _run(int MS);
 };
