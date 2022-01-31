@@ -9,6 +9,7 @@ class Laser {
     const double range; // m
     const double from; // rad
     const double to;  // rad 
+    const double increment;
     std::vector<double> sample_orientations;
 
     Laser(int n_samples, double range, double from, double to):
@@ -16,14 +17,12 @@ class Laser {
                           range(range),
                   n_samples(n_samples),
                             from(from),
-                                to(to) {init_samples();}
-    
-    Laser():
-            n_samples(100),
-            sample_orientations(100),
-            range(5),
-            from(0),
-            to(M_PI) {init_samples();}
+                                to(to),
+                                //increment((to-from)/(n_samples-1)) // [from->to]
+                                increment((to-from)/(n_samples)) // [from->to) {init_samples();}
+                                {init_samples();}
+    Laser() :Laser(100,5,0,M_PI) {}
+
 
     void init_samples();
 

@@ -1,13 +1,12 @@
 #include "world.h"
 #include <math.h>
 #include <chrono>
-#include <thread>
 
 using namespace sim2d;
 
 uint64_t timeSinceEpochMillisec() {
   using namespace std::chrono;
-  return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+  return duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count();
 }
 
 void World::update(){
@@ -16,7 +15,8 @@ void World::update(){
         robot.move(UPDATE_RATE/1000);
 }
 
-bool World::check_collision(vec2 pxy) const {
+// with this method robot may pass through wall if it is very fast
+bool World::check_collision(vec2 pxy) const { 
     // get the robot position in the map
     grid2 gpos = real_units_to_cell(pxy);
     auto it = robot_footprint.begin();
@@ -49,14 +49,19 @@ std::vector<grid2> World::get_footprint() {
     return vec;
 }
 
-void World::run() {
+std::thread World::run() {
     running = true;
-    auto t = new std::thread(&World::_run,this,UPDATE_RATE);
+
+    // my world object may be in the stack of the main thread but i think threads share 
+    // addresses so if i pass "this" then the simulation thread should be able to update the
+    // position of the robot.
+    return std::thread(&World::_run,this,UPDATE_RATE); 
 }
 
 void World::_run(int MS) {
+    std::cout << "start simulation"<< std::endl;
     //https://stackoverflow.com/questions/46609863/execute-function-every-10-ms-in-c
-    auto now = std::chrono::system_clock::now(); 
+    auto now = std::chrono::high_resolution_clock::now(); 
     auto next = now + std::chrono::milliseconds(MS);
     while(running) {
 
@@ -64,8 +69,14 @@ void World::_run(int MS) {
         update();
         m.unlock();
 
-
         std::this_thread::sleep_until(next);
         next+=std::chrono::milliseconds(MS);
     }
+    std::cout << "stop simulation"<< std::endl;
+}
+
+void World::compute_laser_scans() {
+    // https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+    // https://github.com/rtv/Stage/blob/master/libstage/world.cc
+    
 }
