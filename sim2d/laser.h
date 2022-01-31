@@ -19,9 +19,9 @@ class Laser {
                             from(from),
                                 to(to),
                                 //increment((to-from)/(n_samples-1)) // [from->to]
-                                increment((to-from)/(n_samples)) // [from->to) {init_samples();}
+                                increment((to-from)/(n_samples)) // [from->to)
                                 {init_samples();}
-    Laser() :Laser(100,5,0,M_PI) {}
+    Laser() :Laser(50,5,0,2*M_PI) {}
 
 
     void init_samples();
