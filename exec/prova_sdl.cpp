@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
 
     ros::Subscriber vel_commands = n.subscribe(cmd_vel_topic, 10, &sim2d_ros::World_ros::cmd_vel_callback, &w_ros);
 
-    w.set_xyp( {10,12, M_PI/4});
+    w.set_xyp( {3.5,7.7, 3*M_PI/4});
     w.set_vel( {0, 0} );
 
     sim2d_g::Gui gui(w,10);

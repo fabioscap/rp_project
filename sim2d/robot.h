@@ -5,7 +5,7 @@ it is characterized by:
 -> linear speed 
 -> rotational speed
 
-[ maybe not related in the robot but to the world]
+[ maybe not related to the robot but to the world]
 -> position
 -> orientation
 */
