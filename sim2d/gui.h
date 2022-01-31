@@ -17,15 +17,10 @@ class Gui {
 
     int update_rate = 100; //ms
 
-    sim2d::World* w_ptr;
+    sim2d::World& world;
 
-    Gui(sim2d::World& w) {
-        w_ptr = &w;
-    }
-    Gui(sim2d::World& w, int update_rate): update_rate(update_rate) {
-        w_ptr = &w;
-
-    }
+    Gui(sim2d::World& w): world(w) {}
+    Gui(sim2d::World& w, int update_rate): update_rate(update_rate), world(w) {}
 
     std::thread run();
 
