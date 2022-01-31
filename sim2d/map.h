@@ -25,9 +25,9 @@ class Map {
     const cell_index dimension; // pixels
 
 
-    inline cell_value& at(cell_index i, cell_index j) {return _at(i,j);}
+    //inline cell_value& at(cell_index i, cell_index j) {return _at(i,j);}
     inline const cell_value& at(cell_index i, cell_index j) const {return _at(i,j);}
-    inline cell_value& at(const grid2& ij) {return _at(ij[0],ij[1]);}
+    //inline cell_value& at(const grid2& ij) {return _at(ij[0],ij[1]);}
     inline const cell_value& at(const grid2& ij) const {return _at(ij[0],ij[1]);}
     
     Map(const Map& other):  width(other.width),
@@ -47,17 +47,18 @@ class Map {
                                             height(h),
                                             data(d),
                                             dimension(w*h) {};
-    //protected:
-        std::vector<cell_value> data; // occupancy grid
-
-        inline cell_value& _at(cell_index i, cell_index j) {
-            assert(i>=0&&j>=0&&i<width&&j<height&&"please access map with valid index");
-            return data[j*width+i];
-        }
-        inline const cell_value& _at(cell_index i, cell_index j) const {            
-            assert(i>=0&&j>=0&&j<height&&i<width&&"please access map with valid index");
-            return data[j*width+i];
-        }
+    protected:
+    std::vector<cell_value> data; // occupancy grid
+    /*
+    inline cell_value& _at(cell_index i, cell_index j) {
+        assert(i>=0&&j>=0&&i<width&&j<height&&"please access map with valid index");
+        return data[j*width+i];
+    }
+    */
+    inline const cell_value& _at(cell_index i, cell_index j) const {            
+        assert(i>=0&&j>=0&&j<height&&i<width&&"please access map with valid index");
+        return data[j*width+i];
+    }
 };
 
 
