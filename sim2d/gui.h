@@ -33,7 +33,7 @@ class Gui {
     protected:
     std::mutex m;
     bool running = false;
-    void draw_robot(const vec3&pose);
+    void draw_robot(cell_index x, cell_index y, double a);
     void _run();
 
 };

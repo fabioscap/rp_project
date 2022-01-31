@@ -7,11 +7,8 @@
 #define MAP_EMPTY   0xffffffff
 #define MAP_UNKNOWN 0xff4b5e5b
 
-void sim2d_g::Gui::draw_robot(const vec3&pose) // draws the robot on the screen
-{
-    int x = pose[0]/world.map.resolution;
-    int y = world.map.height-1-pose[1]/world.map.resolution;
-    double a = pose[2];
+void sim2d_g::Gui::draw_robot(cell_index x, cell_index y, double a) { // draws the robot on the screen 
+
     SDL_SetRenderDrawColor(renderer, 0xff, 0x00, 0xff, 0xff);
     
     auto it = world.robot_footprint.begin();
@@ -59,6 +56,9 @@ void sim2d_g::Gui::_run() {
 
     auto now = std::chrono::system_clock::now(); 
     auto next = now + std::chrono::milliseconds(update_rate);
+
+    std::vector<grid2> scans;
+
     while(running) {
         if (SDL_PollEvent(&event)){
             if (event.type == SDL_QUIT){
@@ -68,11 +68,26 @@ void sim2d_g::Gui::_run() {
         }
 
         vec3 pose = world.get_xyp();
+        cell_index x = round(pose[0]/world.map.resolution);
+        cell_index y = round(world.map.height-1-pose[1]/world.map.resolution); // flip y to draw correctly
+        double a = pose[2];
 
-        SDL_RenderCopy(renderer,map_texture,NULL,NULL);
+        world.get_laser_scans(scans);
+        SDL_SetRenderDrawColor(renderer, 0x00, 0xff, 0xcc, 0xff);
 
-        draw_robot(pose);
+        SDL_RenderCopy(renderer,map_texture,NULL,NULL); // draw map
+
+
     
+        auto it = scans.begin();
+        while (it != scans.end()) {
+
+            SDL_RenderDrawLine(renderer,x,y,x+(*it)[0],y-(*it)[1]); // y is always flipped
+            it++;
+        }          
+
+        draw_robot(x,y,a); // draw robot
+        
         SDL_RenderPresent(renderer);
 
         std::this_thread::sleep_until(next);
