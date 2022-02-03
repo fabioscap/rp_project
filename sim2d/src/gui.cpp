@@ -72,7 +72,7 @@ void sim2d_g::Gui::_run() {
         cell_index y = round(world.map.height-1-pose[1]/world.map.resolution); // flip y to draw correctly
         double a = pose[2];
 
-        world.get_laser_scans(scans);
+        world.get_laser_scans_grid(scans);
         SDL_SetRenderDrawColor(renderer, 0x00, 0xff, 0xcc, 0xff);
 
         SDL_RenderCopy(renderer,map_texture,NULL,NULL); // draw map

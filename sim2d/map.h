@@ -16,7 +16,7 @@ typedef rp::Vec_<cell_index,2> grid2;
 
 namespace sim2d {
 
-
+// TODO add map origin and rotation (as of now map origin is 0,0 and rotation is 0)
 class Map {
     public:
     const double resolution; // m/pixel

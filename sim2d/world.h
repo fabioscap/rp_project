@@ -19,7 +19,8 @@ class World {
     Map map;
     Robot robot;
     Laser laser;
-    std::vector<grid2> laser_scans;
+    std::vector<grid2> laser_scans_grid;
+    std::vector<float> laser_scans_ranges;
     const int radius_cells; // robot size, but in pixels
     const std::vector<grid2> robot_footprint; // a circle that represents the robot in cells
 
@@ -27,14 +28,16 @@ class World {
                                       robot(robot_size),                             
                                       radius_cells(round((robot.radius/map.resolution))),
                                       range_cells(round((laser.range/map.resolution))),
-                                      laser_scans(laser.n_samples),
+                                      laser_scans_grid(laser.n_samples),
+                                      laser_scans_ranges(laser.n_samples),
                                       robot_footprint(get_footprint()) {}
 
     World(Map& m, Robot& r): map(m), 
                              robot(r),
                              radius_cells(round((robot.radius/map.resolution))),
                              range_cells(round((laser.range/map.resolution))),
-                             laser_scans(laser.n_samples),
+                             laser_scans_grid(laser.n_samples),
+                             laser_scans_ranges(laser.n_samples),
                              robot_footprint(get_footprint()) {}
 
     inline grid2 real_units_to_cell(vec2 pxy) const {
@@ -51,9 +54,15 @@ class World {
         return pose;
     }
 
-    inline const void get_laser_scans(std::vector<grid2>& scans) {
+    inline const void get_laser_scans_grid(std::vector<grid2>& scans) {
         m.lock();
-        scans = laser_scans; // copy
+        scans = laser_scans_grid; // copy
+        m.unlock();
+    }
+
+    inline const void get_laser_scans_ranges(std::vector<float>& scans) {
+        m.lock();
+        scans = laser_scans_ranges; // copy
         m.unlock();
     }
 

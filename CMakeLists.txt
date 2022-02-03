@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(rp_project)
 
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs tf2 tf2_geometry_msgs tf2_ros)
 
 catkin_package()
 
@@ -13,6 +13,4 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/sim2d)
 add_subdirectory(${PROJECT_SOURCE_DIR}/sim2d_ros)
 
 add_executable(Prova_sdl exec/prova_sdl.cpp)
-target_link_libraries(Prova_sdl ${catkin_LIBRARIES})
-target_link_libraries(Prova_sdl sim2d)
-target_link_libraries(Prova_sdl sim2d_ros)
+target_link_libraries(Prova_sdl ${catkin_LIBRARIES} sim2d sim2d_ros SDL2)

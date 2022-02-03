@@ -24,10 +24,16 @@ bool World::check_collision(vec2 pxy) const {
     while (it != robot_footprint.end()) { //openmp?
         auto point = *it + gpos;
         // out of bounds             
-        if(point[0] < 0 || point[0] >= map.width) {std::cout << "bounds" <<std::endl;return true;}
-        if(point[1] < 0 || point[1] >= map.height) {std::cout << "bounds" <<std::endl;return true;}
+        if(point[0] < 0 || point[0] >= map.width) {
+            //std::cout << "bounds" <<std::endl;
+            return true;}
+        if(point[1] < 0 || point[1] >= map.height) {
+            //std::cout << "bounds" <<std::endl;
+            return true;}
         // hit wall
-        if (map.at(point) == SIM2d_WALL) {std::cout << "wall at: "<< point <<std::endl;return true;}
+        if (map.at(point) == SIM2d_WALL) {
+            //std::cout << "wall at: "<< point <<std::endl;
+            return true;}
 
         it++;
     }
@@ -62,7 +68,7 @@ std::thread World::run() {
 void World::_run(int MS) {
     std::cout << "start simulation"<< std::endl;
     //https://stackoverflow.com/questions/46609863/execute-function-every-10-ms-in-c
-    auto now = std::chrono::high_resolution_clock::now(); 
+    auto now = std::chrono::high_resolution_clock::now(); // or from ros clock?
     auto next = now + std::chrono::milliseconds(MS);
     while(running) {
 
@@ -91,95 +97,36 @@ void World::compute_laser_scans() {
                         laser.range*cos(laser.sample_orientations[i]+robot.pa()),
                         laser.range*sin(laser.sample_orientations[i]+robot.pa()),
                         })) + start; 
-        laser_scans[i] = laser_hit(start,end);
+        grid2 hit =laser_hit(start,end);
+        laser_scans_grid[i] = hit;
+        laser_scans_ranges[i] = sqrt(hit[0]*hit[0]+hit[1]*hit[1])*map.resolution;
+        
     }
     
     
 }
 
 grid2 World::laser_hit(grid2 start, grid2 end) {
-    /*  i need to check in which region of the plane the line is:
-        1) 0< <pi/4      -> x++, y++
-        2) pi/4< <pi/2   -> y++, x++
-        3) pi/2< <3pi/4  -> y++, x--
-        4) 3pi/4< <pi    -> x--. y++
-        5) pi< <5pi/4    -> x--, y--
-        6) 5pi/4< <3pi/2 -> y--, x--
-        7) 3pi/2< <7pi/4 -> y--, x++
-        8) 7pi/4< <2pi   -> x++, y--
 
-        8 regions so i need 3 checks
-    */
-    cell_index dx = end[0]-start[0];
-    cell_index dy = end[1]-start[1];
-    
-    if (dy > 0) { // upper half circle
-        if (dx > 0) { // first quadrant
-            if (dx > dy) { 
-                // 1)
-                //std::cout<<"1"<<std::endl;
-                return laser_hit_1o(start,end,0,+1); // no transformation needed
-            } else {
-                // 2)
-                //std::cout<<"2"<<std::endl;
-                return laser_hit_1o(start,end,1,+1);
-            }
-        } else { // second quadrant
-            if (dy > -dx) {
-                // 3)
-                //std::cout<<"3"<<std::endl;
-                return laser_hit_1o(start,end,1,+1);
-            } else {
-                // 4)
-                //std::cout<<"4"<<std::endl;
-                return laser_hit_1o(start,end,0,-1);
-            }
-        }
-    } else { // lower half circle
-        if (dx < 0) { // third quadrant
-            if (dx < dy) { 
-                // 5)
-                //std::cout<<"5"<<std::endl;
-                return laser_hit_1o(start,end,0,-1);
-            } else {
-                // 6)
-                //std::cout<<"6"<<std::endl;
-                return laser_hit_1o(start,end,1,-1);
-            }
-        } else { // fourth quadrant
-            if (dx < -dy) {
-                // 7)
-                //std::cout<<"7"<<std::endl;
-                return laser_hit_1o(start,end,1,-1);
-            } else {
-                // 8)
-                //std::cout<<"8"<<std::endl;
-                return laser_hit_1o(start,end,0,1);
-            }
-        }
-    }
-
-    std::cout<<"other"<<std::endl;  
-    return grid2({0,0});
-    
-}
-
-grid2 World::laser_hit_1o(grid2 start, grid2 end,int index,int index_direction) {
-    // assume 1st quadrant and slope < 1 
     grid2 dxdy = (end-start);
 
-    grid2 point;
+    int index = 0;
+    if (abs(dxdy[1]) > abs(dxdy[0])) index = 1;
 
-    dxdy[index] *= index_direction;
+    int index_direction = +1;
+    if (dxdy[index] <0) {
+        dxdy[index] *= -1;
+        index_direction = -1;
+    }
     
-    int increment_other = +1;
+    int other_direction = +1;
     if (dxdy[!index] < 0) {
         dxdy[!index] *= -1;
-        increment_other = -1;
+        other_direction = -1;
     }
 
     cell_index discriminant = 2*(dxdy[!index]) - (dxdy[index]);
-
+    grid2 point;
     for (point=start; (point[index]-end[index])*index_direction<=0; point[index]+=index_direction) {
         // https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm 
 
@@ -193,7 +140,7 @@ grid2 World::laser_hit_1o(grid2 start, grid2 end,int index,int index_direction) 
 
         // determine if the next pixel is on the next row/column or the previous.
         if (discriminant > 0) {
-            point[!index] += increment_other;
+            point[!index] += other_direction;
             discriminant += 2*(dxdy[!index]-dxdy[index]);
         } else {
             discriminant += 2*dxdy[!index];

@@ -23,8 +23,9 @@ class Robot {
     public:
 
     const double radius; // m
-    rp::Vec_<double,2> vel; // linear vel and angular vel (m/s rad/s)
-    rp::Vec_<double,3> pose; // m m rad
+
+    vec2 vel; // linear vel and angular vel (m/s rad/s)
+    vec3 pose; // m m rad
 
     Robot(double s): radius(s) {}
 
