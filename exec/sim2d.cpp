@@ -51,6 +51,7 @@ int main(int argc, char* argv[]) {
 
     ros::Subscriber vel_commands = n.subscribe(cmd_vel_topic, 10, &sim2d_ros::World_ros::cmd_vel_callback, &w_ros);
 
+    // placeholder for placing the robot in the map
     w.set_xyp( {3.5,7.7, M_PI/4});
     w.set_vel( {0, 0} );
 
@@ -93,8 +94,6 @@ int main(int argc, char* argv[]) {
         vec3 pose = w.get_xyp_odom();
         vec3 vel = w.get_vel_cartesian();
         w.get_laser_scans_ranges(scans);
-
-        ros::spinOnce(); // fetch incoming messages
 
         // publish odom->base_link
         tf_msg.header.stamp = ros::Time::now();
@@ -147,6 +146,7 @@ int main(int argc, char* argv[]) {
         scan_msg.header.stamp = now;
         scan_pub.publish(scan_msg);
 
+        ros::spinOnce(); // fetch incoming messages
         r.sleep();
     }
 

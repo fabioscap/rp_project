@@ -14,7 +14,7 @@ namespace sim2d {
 class World {
     public:
 
-    const double UPDATE_RATE = 1; // ms;
+    const double UPDATE_RATE = 1; // s;
 
     Map map;
     Robot robot;
