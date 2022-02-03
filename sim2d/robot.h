@@ -25,9 +25,14 @@ class Robot {
     const double radius; // m
 
     vec2 vel; // linear vel and angular vel (m/s rad/s)
+    vec2 vel_reference; // linear vel and angular target vel (m/s rad/s) 
     vec3 pose; // m m rad
 
-    Robot(double s): radius(s) {}
+    // currently both for accelerating and for braking
+    const double al_max = 0.05; // max linear acc m/s^2
+    double aa_max = 0.05; // max angular acc rad/s^2
+
+    Robot(double s): radius(s),pose({0,0,0}),vel({0,0}),vel_reference({0,0}) {}
 
     inline double& vl() {return vel[0];}
     inline double& va() {return vel[1];}
@@ -44,7 +49,7 @@ class Robot {
 
     vec3 get_xya_speed(double offset);
     void move(double dt);
-
+    void update(double dt);
 
     
 
