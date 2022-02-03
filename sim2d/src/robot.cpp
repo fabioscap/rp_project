@@ -15,10 +15,8 @@ T clamp(T v, T value){
 using namespace sim2d;
 
 void Robot::update(double dt) {
-    // P 
-    vel[0] = clamp(10*(vel_reference[0]-vel[0]),al_max) + vel[0];
-    vel[1] = clamp(1*(vel_reference[1]-vel[1]),aa_max) + vel[1];
-    //
+    // to be replaced with a controller
+    vel = vel_reference;
 }
 
 vec3 Robot::get_xya_speed(double offset) {
