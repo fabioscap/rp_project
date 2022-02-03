@@ -60,10 +60,11 @@ int main(int argc, char* argv[]) {
     std::vector<float> scans;
     sensor_msgs::LaserScan scan_msg;
 
-    // publish base_link->laser (static)
+    tf2_ros::TransformBroadcaster odom_to_base_link;
     tf2_ros::StaticTransformBroadcaster base_link_to_laser;
     geometry_msgs::TransformStamped tf_msg;
 
+    // publish base_link->laser (static)
     tf_msg.header.stamp = ros::Time::now();
     tf_msg.header.frame_id = "base_link";
     tf_msg.child_frame_id = "laser";
@@ -80,6 +81,7 @@ int main(int argc, char* argv[]) {
 
     base_link_to_laser.sendTransform(tf_msg);
 
+
     ros::Rate r(10); // 10 hz
     while (ros::ok()) {
         ros::Time now = ros::Time::now();
@@ -87,8 +89,25 @@ int main(int argc, char* argv[]) {
         ros::spinOnce(); // fetch incoming messages
 
         // publish odom->base_link
+        vec3 pose = w.get_xyp_odom();
+        tf_msg.header.stamp = ros::Time::now();
+        tf_msg.header.frame_id = "odom";
+        tf_msg.child_frame_id = "base_link";
+        tf_msg.transform.translation.x = pose[0];
+        tf_msg.transform.translation.y = pose[1];
+        tf_msg.transform.translation.z = 0.0;
+        tf2::Quaternion q;
+        q.setRPY(0, 0, pose[2]);
+        tf_msg.transform.rotation.x = q.x();
+        tf_msg.transform.rotation.y = q.y();
+        tf_msg.transform.rotation.z = q.z();
+        tf_msg.transform.rotation.w = q.w();
+
+        odom_to_base_link.sendTransform(tf_msg);    
 
         // publish odom
+        //http://wiki.ros.org/navigation/Tutorials/RobotSetup/Odom
+        
 
         // publish base scan
         w.get_laser_scans_ranges(scans);

@@ -24,6 +24,8 @@ class World {
     const int radius_cells; // robot size, but in pixels
     const std::vector<grid2> robot_footprint; // a circle that represents the robot in cells
 
+    vec3 initial_pose; // useful for odom
+
     World(Map&m,double robot_size): map(m), 
                                       robot(robot_size),                             
                                       radius_cells(round((robot.radius/map.resolution))),
@@ -40,14 +42,16 @@ class World {
                              laser_scans_ranges(laser.n_samples),
                              robot_footprint(get_footprint()) {}
 
-    inline grid2 real_units_to_cell(vec2 pxy) const {
-        return {(cell_index)(round(pxy[0]/map.resolution)),
-                (cell_index)(round(pxy[1]/map.resolution))};
-    }
-
     std::thread run(); 
 
-    inline const vec3 get_xyp() { // blocking
+    inline const vec3 get_xyp() { // blocking until it can lock
+        m.lock();
+        const vec3 pose(odom_to_map(robot.pose));
+        m.unlock();
+        return pose;
+    }
+
+    inline const vec3 get_xyp_odom() { // blocking
         m.lock();
         const vec3 pose(robot.pose);
         m.unlock();
@@ -66,9 +70,10 @@ class World {
         m.unlock();
     }
 
-    inline void set_xyp(vec3 pose) { // blocking
+    inline void set_xyp(const vec3& pose) { // blocking
         m.lock();
-        robot.pose = pose;
+        initial_pose = pose;
+        robot.pose = {0,0,0};
         m.unlock();
     }
 
@@ -79,7 +84,7 @@ class World {
         return vel;
     }
 
-    inline void set_vel(vec2 vel) { // blocking
+    inline void set_vel(const vec2& vel) { // blocking
         m.lock();
         robot.vel = vel;
         m.unlock();
@@ -101,14 +106,32 @@ class World {
     void _run(int MS);
     void update();
 
-    bool check_collision(vec2 pxy) const;
+    bool check_collision(const vec2& pxy) const;
 
     // assuming the robot is a plate like a roomba the footprint is all points 
     // such that x^2 + y^2 <= radius^2
     std::vector<grid2> get_footprint();
 
     void compute_laser_scans();
-    grid2 laser_hit_1o(grid2 start, grid2 end,int index=0,int index_direction=+1);
-    grid2 laser_hit(grid2 start, grid2 end);
+    grid2 laser_hit(const grid2& start,const grid2& end);
+
+    inline vec3 odom_to_map(const vec3& pose) {
+        return initial_pose + vec3({robot.pose[0]*cos(initial_pose[2])-robot.pose[1]*sin(initial_pose[2]),
+                                    robot.pose[0]*sin(initial_pose[2])+robot.pose[1]*cos(initial_pose[2]),
+                                    robot.pose[2]});
+    }
+    /*
+    inline vec2 odom_to_map(const vec2& pose) {
+        return {initial_pose[0]+robot.pose[0]*cos(initial_pose[2])-robot.pose[1]*sin(initial_pose[2]),
+                initial_pose[1]+robot.pose[0]*sin(initial_pose[2])-robot.pose[1]*cos(initial_pose[2])};
+    }
+    */
+
+    inline grid2 real_units_to_cell(const vec2& pxy) const {
+        return {(cell_index)(round(pxy[0]/map.resolution)),
+                (cell_index)(round(pxy[1]/map.resolution))};
+    }
+
+
 };
 }

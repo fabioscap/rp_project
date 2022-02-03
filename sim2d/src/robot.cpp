@@ -5,12 +5,11 @@
 
 using namespace sim2d;
 // kinematics
-rp::Vec_<double,2> Robot::get_xy_speed() {
-    rp::Vec_<double,2> cartesian_speed;
-    cartesian_speed[0] = vl()*cos(pa());
-    cartesian_speed[1] = vl()*sin(pa());
-    
-    return cartesian_speed;
+vec3 Robot::get_xya_speed(double offset) {
+    return {
+        vl()*cos(pa()+offset),
+        vl()*sin(pa()+offset),
+        va()};
 }
 
 void Robot::move(double dt) {

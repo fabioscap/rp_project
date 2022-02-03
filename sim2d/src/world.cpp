@@ -4,20 +4,17 @@
 
 using namespace sim2d;
 
-uint64_t timeSinceEpochMillisec() {
-  using namespace std::chrono;
-  return duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count();
-}
 
 void World::update(){
-    vec2 new_pos = robot.pxy() + robot.get_xy_speed()*(UPDATE_RATE/1000);
-    if (!check_collision(new_pos))
+    vec3 new_pose = odom_to_map(robot.pose) + robot.get_xya_speed(initial_pose[2])*(UPDATE_RATE/1000);
+    if (!check_collision({new_pose[0],new_pose[1]}))
         robot.move(UPDATE_RATE/1000);
+
     compute_laser_scans();
 }
 
 // with this method robot may pass through wall if it is very fast
-bool World::check_collision(vec2 pxy) const { 
+bool World::check_collision(const vec2& pxy) const { 
     // get the robot position in the map
     grid2 gpos = real_units_to_cell(pxy);
     auto it = robot_footprint.begin();
@@ -86,16 +83,18 @@ void World::compute_laser_scans() {
     // https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
     // https://github.com/rtv/Stage/blob/master/libstage/world.cc
     // https://en.wikipedia.org/wiki/Digital_differential_analyzer_(graphics_algorithm)
+    
+    vec3 pose = odom_to_map(robot.pose);
 
-    grid2 start = real_units_to_cell(robot.pxy());
+    grid2 start = real_units_to_cell({pose[0],pose[1]});
     
     //grid2 start = grid2({0,0});
 
     
     for (int i=0; i<laser.n_samples; ++i) {
         grid2 end = real_units_to_cell(vec2({
-                        laser.range*cos(laser.sample_orientations[i]+robot.pa()),
-                        laser.range*sin(laser.sample_orientations[i]+robot.pa()),
+                        laser.range*cos(laser.sample_orientations[i]+pose[2]),
+                        laser.range*sin(laser.sample_orientations[i]+pose[2]),
                         })) + start; 
         grid2 hit =laser_hit(start,end);
         laser_scans_grid[i] = hit;
@@ -106,7 +105,7 @@ void World::compute_laser_scans() {
     
 }
 
-grid2 World::laser_hit(grid2 start, grid2 end) {
+grid2 World::laser_hit(const grid2& start,const grid2& end) {
 
     grid2 dxdy = (end-start);
 

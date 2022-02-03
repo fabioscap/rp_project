@@ -42,7 +42,7 @@ class Robot {
     inline const vec2 pxy() const {return {px(),py()};}
 
 
-    vec2 get_xy_speed();
+    vec3 get_xya_speed(double offset);
     void move(double dt);
 
 
