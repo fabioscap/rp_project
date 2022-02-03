@@ -8,6 +8,8 @@
 
 namespace sim2d_g {
 
+// TODO implement zoom, pan, resize...
+// https://gigi.nullneuron.net/gigilabs/handling-keyboard-and-mouse-events-in-sdl2/
 class Gui {
     public:
 
