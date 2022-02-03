@@ -12,5 +12,5 @@ include_directories(${PROJECT_SOURCE_DIR}/sim2d_ros)
 add_subdirectory(${PROJECT_SOURCE_DIR}/sim2d)
 add_subdirectory(${PROJECT_SOURCE_DIR}/sim2d_ros)
 
-add_executable(Prova_sdl exec/prova_sdl.cpp)
-target_link_libraries(Prova_sdl ${catkin_LIBRARIES} sim2d sim2d_ros SDL2)
+add_executable(${PROJECT_NAME}_sim2d exec/sim2d.cpp)
+target_link_libraries(${PROJECT_NAME}_sim2d ${catkin_LIBRARIES} sim2d sim2d_ros SDL2)
