@@ -19,10 +19,10 @@ class World {
     Map map;
     Robot robot;
     Laser laser;
-    std::vector<grid2> laser_scans_grid;
+    std::vector<grid2> laser_scans_grid; // contains the points in the map where the beams bounce (or max range if don't bounce)
     std::vector<float> laser_scans_ranges;
     const int radius_cells; // robot size, but in pixels
-    const std::vector<grid2> robot_footprint; // a circle that represents the robot in cells
+    const std::vector<grid2> robot_footprint; // all the cells occupied by the robot
 
     vec3 initial_pose; // useful for odom
 
@@ -84,9 +84,16 @@ class World {
         return vel;
     }
 
+    inline const vec3 get_vel_cartesian() { // blocking
+        m.lock();
+        const vec3 vel(robot.get_xya_speed(initial_pose[2]));
+        m.unlock();
+        return vel;
+    }
+
     inline void set_vel(const vec2& vel) { // blocking
         m.lock();
-        robot.vel = vel;
+        robot.vel_reference = vel;
         m.unlock();
     }
 
@@ -106,13 +113,16 @@ class World {
     void _run(int MS);
     void update();
 
+    // checks if the robot in pxy collides with a wall or is out of the map
     bool check_collision(const vec2& pxy) const;
 
+    // returns a vector of all the cells occupied by the robot
     // assuming the robot is a plate like a roomba the footprint is all points 
     // such that x^2 + y^2 <= radius^2
     std::vector<grid2> get_footprint();
 
     void compute_laser_scans();
+    // traces a beam on the map
     grid2 laser_hit(const grid2& start,const grid2& end);
 
     inline vec3 odom_to_map(const vec3& pose) {

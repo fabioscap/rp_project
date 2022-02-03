@@ -6,9 +6,11 @@ using namespace sim2d;
 
 
 void World::update(){
+    robot.update(UPDATE_RATE/1000);
     vec3 new_pose = odom_to_map(robot.pose) + robot.get_xya_speed(initial_pose[2])*(UPDATE_RATE/1000);
     if (!check_collision({new_pose[0],new_pose[1]}))
         robot.move(UPDATE_RATE/1000);
+    else robot.vel = {0,0};
 
     compute_laser_scans();
 }
@@ -88,9 +90,6 @@ void World::compute_laser_scans() {
 
     grid2 start = real_units_to_cell({pose[0],pose[1]});
     
-    //grid2 start = grid2({0,0});
-
-    
     for (int i=0; i<laser.n_samples; ++i) {
         grid2 end = real_units_to_cell(vec2({
                         laser.range*cos(laser.sample_orientations[i]+pose[2]),
@@ -106,18 +105,20 @@ void World::compute_laser_scans() {
 }
 
 grid2 World::laser_hit(const grid2& start,const grid2& end) {
-
+    // https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm 
     grid2 dxdy = (end-start);
 
     int index = 0;
     if (abs(dxdy[1]) > abs(dxdy[0])) index = 1;
 
+    // the index of variable that is incremented (or decremented) every time
     int index_direction = +1;
     if (dxdy[index] <0) {
         dxdy[index] *= -1;
         index_direction = -1;
     }
     
+    // the index of the variable that may increment (or decrement) or stay the same
     int other_direction = +1;
     if (dxdy[!index] < 0) {
         dxdy[!index] *= -1;
@@ -127,7 +128,6 @@ grid2 World::laser_hit(const grid2& start,const grid2& end) {
     cell_index discriminant = 2*(dxdy[!index]) - (dxdy[index]);
     grid2 point;
     for (point=start; (point[index]-end[index])*index_direction<=0; point[index]+=index_direction) {
-        // https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm 
 
         // check bounds
         if (point[0]<=0 || point[0] >=map.width) return end-start;

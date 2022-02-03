@@ -8,11 +8,13 @@
 #include <thread>
 
 #include "sensor_msgs/LaserScan.h"
+#include "nav_msgs/Odometry.h"
 
 #include "tf2_ros/static_transform_broadcaster.h"
 #include "tf2_ros/transform_broadcaster.h"
 #include "geometry_msgs/TransformStamped.h"
 #include "tf2/LinearMath/Quaternion.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h" // to convert from geometry_msg quaternion to tf2 quaternion
 
 using namespace sim2d;
 
@@ -56,13 +58,16 @@ int main(int argc, char* argv[]) {
     std::thread simul_thread = w.run();
     std::thread gui_thread = gui.run();
 
-    ros::Publisher scan_publisher = n.advertise<sensor_msgs::LaserScan>(scan_topic,10);
+    ros::Publisher scan_pub = n.advertise<sensor_msgs::LaserScan>(scan_topic,10);
     std::vector<float> scans;
     sensor_msgs::LaserScan scan_msg;
 
     tf2_ros::TransformBroadcaster odom_to_base_link;
     tf2_ros::StaticTransformBroadcaster base_link_to_laser;
     geometry_msgs::TransformStamped tf_msg;
+
+    ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom",15);
+    nav_msgs::Odometry odom_msg;
 
     // publish base_link->laser (static)
     tf_msg.header.stamp = ros::Time::now();
@@ -85,11 +90,13 @@ int main(int argc, char* argv[]) {
     ros::Rate r(10); // 10 hz
     while (ros::ok()) {
         ros::Time now = ros::Time::now();
+        vec3 pose = w.get_xyp_odom();
+        vec3 vel = w.get_vel_cartesian();
+        w.get_laser_scans_ranges(scans);
 
         ros::spinOnce(); // fetch incoming messages
 
         // publish odom->base_link
-        vec3 pose = w.get_xyp_odom();
         tf_msg.header.stamp = ros::Time::now();
         tf_msg.header.frame_id = "odom";
         tf_msg.child_frame_id = "base_link";
@@ -107,10 +114,26 @@ int main(int argc, char* argv[]) {
 
         // publish odom
         //http://wiki.ros.org/navigation/Tutorials/RobotSetup/Odom
-        
+
+        odom_msg.header.stamp = now;
+        odom_msg.header.frame_id = "odom";
+
+        //set the position
+        odom_msg.pose.pose.position.x = pose[0];
+        odom_msg.pose.pose.position.y = pose[1];
+        odom_msg.pose.pose.position.z = 0.0;
+        odom_msg.pose.pose.orientation = tf2::toMsg(q); 
+
+        //set the velocity
+        odom_msg.child_frame_id = "base_link";
+        odom_msg.twist.twist.linear.x = vel[0];
+        odom_msg.twist.twist.linear.y = vel[1];
+        odom_msg.twist.twist.angular.z = vel[2];
+
+        //publish the message
+        odom_pub.publish(odom_msg);
 
         // publish base scan
-        w.get_laser_scans_ranges(scans);
         scan_msg.angle_min = w.laser.from;
         scan_msg.angle_max = w.laser.to;
         scan_msg.angle_increment = w.laser.increment;
@@ -122,7 +145,7 @@ int main(int argc, char* argv[]) {
         //scan_msg.intensities
         scan_msg.header.frame_id = "laser";
         scan_msg.header.stamp = now;
-        scan_publisher.publish(scan_msg);
+        scan_pub.publish(scan_msg);
 
         r.sleep();
     }
