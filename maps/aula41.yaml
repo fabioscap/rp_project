@@ -1,0 +1,6 @@
+image:           aula41.png
+resolution:      0.02
+origin:          [ 0.0,  0.0, 0.0 ]
+occupied_thresh: 0.3
+free_thresh:     0.1
+negate:          0
